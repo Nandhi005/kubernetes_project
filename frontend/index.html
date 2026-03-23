@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Microservice Demo</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    button { padding: 10px; margin: 10px; }
+    input { padding: 8px; }
+  </style>
+</head>
+<body>
+
+<h1>🚀 Microservices App</h1>
+
+<!-- Visitor Counter -->
+<button onclick="getCount()">Get Visitors</button>
+<p id="count"></p>
+
+<!-- Greeting -->
+<input type="text" id="name" placeholder="Enter your name">
+<button onclick="sendName()">Greet Me</button>
+<p id="greet"></p>
+
+<!-- Cached Data -->
+<button onclick="getData()">Get Cached Data</button>
+<p id="data"></p>
+
+<button onclick="resetCache()">Reset Cache</button>
+
+<script>
+const backendURL = "/"; // Istio will route
+
+async function getCount() {
+  const res = await fetch(backendURL + "count");
+  const data = await res.json();
+  document.getElementById("count").innerText =
+    "Visitors: " + data.visitors;
+}
+
+async function sendName() {
+  const name = document.getElementById("name").value;
+
+  const res = await fetch(backendURL + "greet", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name })
+  });
+
+  const data = await res.json();
+  document.getElementById("greet").innerText = data.message;
+}
+
+async function getData() {
+  const res = await fetch(backendURL + "data");
+  const data = await res.json();
+
+  document.getElementById("data").innerText =
+    data.source + ": " + data.data;
+}
+
+async function resetCache() {
+  await fetch(backendURL + "reset");
+  alert("Cache cleared!");
+}
+</script>
+
+</body>
+</html>
